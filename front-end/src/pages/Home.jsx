@@ -1,11 +1,13 @@
-
+import Slider_Main from "../sub_components_pages/Slider_Main";
+import Products from "../sub_components_pages/Products";
 
 const Home = () => {
   return (
     <>
-      <main className="bg-black w-full h-2/3">
-        <h1>EAE CARA</h1>
-      </main>
+      <main className="h-[200%]">
+        <Slider_Main/>
+        <Products/>
+      </main> 
     </>
   )
 }
