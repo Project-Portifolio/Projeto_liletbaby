@@ -1,6 +1,5 @@
 package br.com.liletbaby.back_end.models;
 
-import jakarta.annotation.Generated;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -8,6 +7,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
+
+/**
+ * Produto class.
+ *
+ * @author Wender Couto
+ * @since 0.0.1-SNAPSHOT
+ */
 
 @Data
 @Entity
@@ -60,10 +66,6 @@ public class Produto {
 
     public Integer getProductId() {
         return productId;
-    }
-
-    public void setProductId(Integer productId) {
-        this.productId = productId;
     }
 
     public String getName() {

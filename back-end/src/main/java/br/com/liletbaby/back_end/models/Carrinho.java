@@ -1,15 +1,15 @@
 package br.com.liletbaby.back_end.models;
 
-import jakarta.annotation.Generated;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
+
+/**
+ * Carrinho class.
+ *
+ * @author Wender Couto
+ * @author Joao Abreu
+ * @since 0.0.1-SNAPSHOT
+ */
 
 @Data
 @Entity
