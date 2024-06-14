@@ -2,6 +2,7 @@ package br.com.liletbaby.back_end.controller;
 
 import br.com.liletbaby.back_end.models.Produto;
 import br.com.liletbaby.back_end.repository.ProdutoRepositorio;
+import br.com.liletbaby.back_end.services.DataValidatorService;
 import br.com.liletbaby.back_end.utils.NumericConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,9 +38,9 @@ public class ProdutosController {
         Double discount = NumericConverter.safeParseDouble(payload.get("discount"));
         Double price = NumericConverter.safeParseDouble(payload.get("price"));
 
+        String parsedData = DataValidatorService.validator(name, sku, color, size, stock, discount, price);
 
-        if (name == null || sku == null || color == null || size == null || name.isBlank() || sku.isBlank()
-                || color.isBlank() || size.isBlank() || stock == null || discount == null || price == null) {
+        if (parsedData == null || parsedData.isBlank()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Dados inválidos.");
         }
 

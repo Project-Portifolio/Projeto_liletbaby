@@ -41,7 +41,6 @@ public class TokenService {
     }
 
     public String generateToken(Usuario usuario) { //Sempre que o usuário logar de novo um novo token é gerado.
-        System.out.println("tentou");
         try{
             String secret = userSecrets.get(usuario.getUserId());
             if(secret == null || secret.isBlank()){
@@ -55,7 +54,7 @@ public class TokenService {
                     .sign(algorithm);
             return token;
         } catch (JWTCreationException exception){
-            throw new RuntimeException("Error while generating token", exception);
+            return null;
         }
     }
 
@@ -66,27 +65,21 @@ public class TokenService {
     public String validateToken(String token) {
         DecodedJWT jwt = JWT.decode(token);
         String userId = jwt.getSubject();
-        System.out.println(userId + " Este é o userID suposto");
         String secret = userSecrets.get(Integer.parseInt(userId));
-        System.out.println(secret + " Este é o secret suposto");
 
-        if (secret != null && !secret.isBlank()) {
-            try{
-                Algorithm algorithm = Algorithm.HMAC512(secret);
-                JWTVerifier verifier = JWT.require(algorithm)
-                        .withIssuer("auth0-api-liletbaby")
-                        .build();
-                verifier.verify(token);
-                return userId;
-            }catch(JWTVerificationException exception){
-                secret = generateSecret(new Usuario(Integer.parseInt(userId))); // A verificar.
-                userSecrets.put(Integer.parseInt(userId), secret);
-                return generateToken(new Usuario(Integer.parseInt(userId)));
-            }
-        } else {
-            secret = generateSecret(new Usuario(Integer.parseInt(userId)));
-            userSecrets.put(Integer.parseInt(userId), secret);
-            return generateToken(new Usuario(Integer.parseInt(userId)));
+        if (secret == null || secret.isBlank()) {
+            return null;
+        }
+
+        try {
+            Algorithm algorithm = Algorithm.HMAC512(secret);
+            JWTVerifier verifier = JWT.require(algorithm)
+                    .withIssuer("auth0-api-liletbaby")
+                    .build();
+            verifier.verify(token);
+            return userId;
+        } catch (JWTVerificationException exception) {
+            return null;
         }
     }
 }

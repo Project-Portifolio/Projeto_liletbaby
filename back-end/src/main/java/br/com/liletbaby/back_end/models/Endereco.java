@@ -49,7 +49,7 @@ public class Endereco {
     @Column(nullable = true)
     private String phoneNumber;
 
-    public Endereco(){
+    public Endereco() {
 
     }
 

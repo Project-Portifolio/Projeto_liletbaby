@@ -28,7 +28,6 @@ import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity
 public class WebSecurityConfig extends SecurityConfigurerAdapter {
 
     @Autowired
@@ -46,6 +45,7 @@ public class WebSecurityConfig extends SecurityConfigurerAdapter {
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers(HttpMethod.POST,   "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST,   "/auth/register").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/auth/user/update").permitAll()
                         .requestMatchers(HttpMethod.POST, "/store/*/cadastro").authenticated()
                         .anyRequest().authenticated()
                 )
@@ -54,8 +54,7 @@ public class WebSecurityConfig extends SecurityConfigurerAdapter {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
-            throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
@@ -63,5 +62,4 @@ public class WebSecurityConfig extends SecurityConfigurerAdapter {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
 }
