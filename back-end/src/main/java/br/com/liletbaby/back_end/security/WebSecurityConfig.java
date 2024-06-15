@@ -28,7 +28,7 @@ import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 @EnableWebSecurity
-public class WebSecurityConfig extends SecurityConfigurerAdapter {
+public class WebSecurityConfig {
 
     @Autowired
     private SecurityFilter securityFilter;

@@ -3,8 +3,10 @@ package br.com.liletbaby.back_end.models;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Arrays;
 import java.util.Collection;
 
 /**
@@ -27,8 +29,8 @@ public class Usuario implements UserDetails {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = true)
-    private String role;
+    @Column(nullable = false)
+    private String roles;
 
     @Column(nullable = true)
     private String nameCompleto;
@@ -64,12 +66,12 @@ public class Usuario implements UserDetails {
         this.name = name;
     }
 
-    public String getRole() {
-        return role;
+    public String getRoles() {
+        return roles;
     }
 
     public void setRole(String role) {
-        this.role = role;
+        this.roles = role;
     }
 
     public String getNameCompleto() {
@@ -102,7 +104,10 @@ public class Usuario implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return Arrays.stream(roles
+                        .split(","))
+                .map(SimpleGrantedAuthority::new)
+                .toList();
     }
 
     public String getPassword() {
@@ -116,7 +121,6 @@ public class Usuario implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return UserDetails.super.isEnabled();
+        return true;
     }
-
 }

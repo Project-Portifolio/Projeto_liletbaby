@@ -16,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,17 +55,32 @@ public class LoginController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Dados inválidos.");
         }
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(username, password));
-
-        if (authentication.isAuthenticated()) {
-            Usuario usuario = (Usuario) authentication.getPrincipal();
-            String token = tokenService.generateToken(usuario);
-            return ResponseEntity.ok(token);
-        } else {
+        List<Usuario> usuarios = usuarioRepositorio.findByName(username);
+        if (usuarios.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário ou senha inválidos.");
         }
+
+        Usuario usuarioAutenticado = null;
+        for (Usuario usuario : usuarios) {
+            if (webSecurityConfig.passwordEncoder().matches(password, usuario.getPassword())) {
+                usuarioAutenticado = usuario;
+                break;
+            }
+        }
+
+        if (usuarioAutenticado == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário ou senha inválidos.");
+        }
+
+        String token = tokenService.generateToken(usuarioAutenticado);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("mensagem", "Credenciais Válidas.");
+        response.put("token", token);
+
+        return ResponseEntity.ok(response);
     }
+
 
     @PostMapping("/register")
     @ResponseBody
@@ -80,7 +96,7 @@ public class LoginController {
         String hashedPassword = webSecurityConfig.passwordEncoder().encode(password);
         Usuario novoUsuario = new Usuario(username, hashedPassword);
 
-        novoUsuario.setRole("USER");
+        novoUsuario.setRole("USER,USER");
         this.usuarioRepositorio.save(novoUsuario);
         return ResponseEntity.ok("Usuario cadastrado com sucesso!");
     }
