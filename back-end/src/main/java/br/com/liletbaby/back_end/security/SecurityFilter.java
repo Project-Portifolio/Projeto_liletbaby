@@ -1,13 +1,14 @@
 package br.com.liletbaby.back_end.security;
 
 import br.com.liletbaby.back_end.repository.UsuarioRepositorio;
-import br.com.liletbaby.back_end.services.TokenService;
+import br.com.liletbaby.back_end.security.providers.TokenCustomProvider;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,7 +29,7 @@ import java.io.IOException;
 public class SecurityFilter extends OncePerRequestFilter {
 
     @Autowired
-    TokenService tokenService;
+    TokenCustomProvider tokenService;
 
     @Autowired
     UsuarioRepositorio usuarioRepositorio;
@@ -37,8 +38,9 @@ public class SecurityFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = this.recoverToken(request);
         if (token != null) {
+            String userId = tokenService.validateToken(token);
             try {
-                String userId = tokenService.validateToken(token);
+
                 UserDetails user = usuarioRepositorio.findByUserId(Integer.valueOf(userId));
 
                 if (user != null) {
@@ -47,7 +49,7 @@ public class SecurityFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             } catch (TokenExpiredException ex) {
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token expired");
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Erro, Token JWT expirado ou ausente. Msg retorno: " + userId);
                 return;
             }
         }

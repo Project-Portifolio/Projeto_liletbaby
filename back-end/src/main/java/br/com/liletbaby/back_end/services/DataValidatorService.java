@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
  *
  * @author Wender Couto
  * @since 0.0.1-SNAPSHOT
+ *
+ * Comment: Class used to format and validate data.
  */
 
 @Service

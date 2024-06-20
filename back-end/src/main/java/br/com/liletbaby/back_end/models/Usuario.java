@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Usuario class.
@@ -46,6 +47,9 @@ public class Usuario implements UserDetails {
 
     @OneToOne
     private Carrinho cartId;
+
+    @Column(nullable = false)
+    private boolean tokenValid = false;
 
     public Usuario () {
     }
@@ -104,10 +108,14 @@ public class Usuario implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Arrays.stream(roles
-                        .split(","))
-                .map(SimpleGrantedAuthority::new)
-                .toList();
+        if (this.roles == "ADMIN") {
+            return List.of(
+                    new SimpleGrantedAuthority("ADMIN"),
+                    new SimpleGrantedAuthority("USER"),
+                    new SimpleGrantedAuthority("GUEST")
+            );
+        }
+        return List.of( new SimpleGrantedAuthority("USER"));
     }
 
     public String getPassword() {
@@ -122,5 +130,14 @@ public class Usuario implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return tokenValid; // Conta não expirada sendo usada para o token jwt
+    }
+
+    public void setTokenValid(boolean tokenValid) {
+        this.tokenValid = tokenValid;
     }
 }

@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -12,6 +13,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
+import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -38,18 +41,23 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        return http
-                .csrf(AbstractHttpConfigurer::disable)
+        return http.csrf(AbstractHttpConfigurer::disable) //localmente não desativar em produção.
                 .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers(HttpMethod.POST,   "/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.POST,   "/auth/register").permitAll()
-                        .requestMatchers(HttpMethod.PUT, "/auth/user/update").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/store/*/cadastro").authenticated()
-                        .anyRequest().authenticated()
-                )
-                .addFilterBefore(securityFilter,UsernamePasswordAuthenticationFilter.class)
+                .sessionManagement(new Customizer<>() {
+                    @Override
+                    public void customize(SessionManagementConfigurer<HttpSecurity> sessionManagement) {
+                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                    }
+                }).authorizeHttpRequests(new Customizer<>() {
+                    @Override
+                    public void customize(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry requestMatchers) {
+                        requestMatchers.requestMatchers(HttpMethod.POST, "/auth/login").permitAll();
+                        requestMatchers.requestMatchers(HttpMethod.POST, "/auth/register").permitAll();
+                        requestMatchers.requestMatchers(HttpMethod.PUT, "/auth/user/update").authenticated();
+                        requestMatchers.anyRequest().authenticated();
+                    }
+                })
+                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
