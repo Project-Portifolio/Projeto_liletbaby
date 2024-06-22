@@ -15,9 +15,11 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
+import org.springframework.security.config.annotation.web.configurers.oauth2.client.OAuth2LoginConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.filter.CorsFilter;
@@ -39,6 +41,9 @@ public class WebSecurityConfig {
     @Autowired
     private CorsFilter corsFilter;
 
+    @Autowired
+    ClientRegistrationRepository clientRegistrationRepository;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http.csrf(AbstractHttpConfigurer::disable) //localmente não desativar em produção.
@@ -55,6 +60,12 @@ public class WebSecurityConfig {
                         requestMatchers.requestMatchers(HttpMethod.POST, "/auth/register").permitAll();
                         requestMatchers.requestMatchers(HttpMethod.PUT, "/auth/user/update").authenticated();
                         requestMatchers.anyRequest().authenticated();
+                    }
+                })
+                .oauth2Login(new Customizer<OAuth2LoginConfigurer<HttpSecurity>>() { // Especificar rota, redirecionar authenticado depois
+                    @Override
+                    public void customize(OAuth2LoginConfigurer<HttpSecurity> httpSecurityOAuth2LoginConfigurer) {
+                        httpSecurityOAuth2LoginConfigurer.clientRegistrationRepository(clientRegistrationRepository);
                     }
                 })
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)

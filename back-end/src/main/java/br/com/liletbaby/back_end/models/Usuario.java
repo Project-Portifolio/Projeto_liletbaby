@@ -57,6 +57,10 @@ public class Usuario implements UserDetails {
     public Usuario(int i) { //Averiguar
     }
 
+    public Integer getUserId () {
+        return userId;
+    }
+
     public Usuario (String username, String password){
         this.name = username;
         this.password = password;
@@ -139,5 +143,9 @@ public class Usuario implements UserDetails {
 
     public void setTokenValid(boolean tokenValid) {
         this.tokenValid = tokenValid;
+    }
+
+    public boolean isTokenValid() {
+        return tokenValid;
     }
 }
