@@ -85,7 +85,7 @@ public class LoginController {
         String hashedPassword = webSecurityConfig.passwordEncoder().encode(password);
         Usuario novoUsuario = new Usuario(username, hashedPassword);
         novoUsuario.setRole("USER");
-        this.usuarioRepositorio.save(novoUsuario);
+        usuarioRepositorio.save(novoUsuario);
         return ResponseEntity.ok("Usuario cadastrado com sucesso!");
     }
 
@@ -95,16 +95,36 @@ public class LoginController {
         String username = payload.get("username"), fullName = payload.get("fullname"), email = payload.get("mail");
         Integer userID = NumericConverter.safeParseInteger(payload.get("userID"));
         String parsedData = DataValidatorService.validator(username, fullName, email);
+        String message = "";
 
         if (parsedData == null || parsedData.isBlank()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Dados inválidos.");
         }
 
         Usuario updatingUser = usuarioRepositorio.findByUserId(userID);
-        updatingUser.setName(username);
-        updatingUser.setNameCompleto(fullName);
-        updatingUser.setEmail(email);
+        Usuario existingUser = usuarioRepositorio.findByName(username);
+
+        if (existingUser != null && !existingUser.getUserId().equals(updatingUser.getUserId())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nome ou Nickname já está em uso.");
+        }
+        if (updatingUser.isOauth2Binded() == true) {
+            if (!updatingUser.getEmail().equals(email)) {
+                message = "\n" + "Não se pode alterar E-Mail vinculado ao Google.";
+            }
+            updatingUser.setName(username);
+            updatingUser.setNameCompleto(fullName);
+        } else {
+            if (!updatingUser.getEmail().equals(email)) {
+                Usuario usedMail = usuarioRepositorio.findByEmail(email);
+                if (usedMail != null) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Divergência de E-Mail.");
+                }
+                updatingUser.setEmail(email);
+            }
+            updatingUser.setName(username);
+            updatingUser.setNameCompleto(fullName);
+        }
         this.usuarioRepositorio.save(updatingUser);
-        return ResponseEntity.ok().body("Dados cadastrais atualizados com sucesso!");
+        return ResponseEntity.ok().body("Dados cadastrais atualizados com sucesso!" + message);
     }
 }

@@ -51,6 +51,9 @@ public class Usuario implements UserDetails {
     @Column(nullable = false)
     private boolean tokenValid = false;
 
+    @Column(nullable = false)
+    private boolean oauth2Bind = false;
+
     public Usuario () {
     }
 
@@ -141,11 +144,19 @@ public class Usuario implements UserDetails {
         return tokenValid; // Conta não expirada sendo usada para o token jwt
     }
 
+    public boolean isTokenValid() {
+        return tokenValid;
+    }
+
     public void setTokenValid(boolean tokenValid) {
         this.tokenValid = tokenValid;
     }
 
-    public boolean isTokenValid() {
-        return tokenValid;
+    public boolean isOauth2Binded(){
+        return oauth2Bind;
+    }
+
+    public void setOauth2Bind(boolean oauth2Bind) {
+        this.oauth2Bind = oauth2Bind;
     }
 }

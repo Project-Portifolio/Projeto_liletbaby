@@ -37,7 +37,7 @@ public class TokenCustomProvider {
     private static final Random RANDOM = new SecureRandom();
     private static final int SECRET_LENGTH = 256;
     private Map<Integer, String> userSecrets = new HashMap<>();
-    private HashMap<Integer, String> tempUserSecrets = new HashMap<>(); // Poderia ser um Map UUID, String se o Integer não fosse único no outro map.
+    private HashMap<Integer, String> tempUserSecrets = new HashMap<>();
 
     public String generateSecret(Usuario usuario){
         byte[] tokenSecret = new byte[SECRET_LENGTH];

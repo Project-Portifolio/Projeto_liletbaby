@@ -48,6 +48,7 @@ public class GoogleAuthSuccessHandler implements AuthenticationSuccessHandler {
             usuario.setNameCompleto(nameCompleto);
             usuario.setRoles("USER");
             usuario.setTokenValid(true);
+            usuario.setOauth2Bind(true);
             usuario.setPassword(generateRandomPassword());
             usuario = usuarioRepositorio.save(usuario);
         }

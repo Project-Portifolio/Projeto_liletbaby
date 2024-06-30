@@ -40,7 +40,6 @@ public class SecurityFilter extends OncePerRequestFilter {
         if (token != null) {
             String userId = tokenService.validateToken(token);
             try {
-
                 UserDetails user = usuarioRepositorio.findByUserId(Integer.valueOf(userId));
 
                 if (user != null) {
