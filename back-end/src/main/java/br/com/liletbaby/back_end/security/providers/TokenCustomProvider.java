@@ -52,7 +52,6 @@ public class TokenCustomProvider {
         String existingToken = getExistingToken(userId);
 
         if (existingToken != null) {
-            System.out.println("Recuperou o token: " + existingToken);
             return existingToken;
         }
 
@@ -75,8 +74,6 @@ public class TokenCustomProvider {
     }
 
     private void storeToken(String userId, String token) {
-        // Lógica para armazenar o token, por exemplo, em um banco de dados
-        // Aqui, estamos apenas armazenando na memória em um mapa userSecrets
         userSecrets.put(Integer.valueOf(userId), token);
     }
 
@@ -91,9 +88,7 @@ public class TokenCustomProvider {
 
         Usuario user = usuarioRepositorio.findByUserId(Integer.valueOf(userId));
 
-        printUserSecretsMap();
         if (user.isTokenValid() != false && issuer.equals(TOKEN_ISSUER)) {
-            System.out.println("Aqui mudou? " + user.isTokenValid());
             return userId;
         } else {
 
@@ -120,20 +115,11 @@ public class TokenCustomProvider {
                 user.setTokenValid(false);
                 return "Token JWT expirado.";
             } else {
-                System.out.println("Deu aqui");
                 user.setTokenValid(true);
                 usuarioRepositorio.save(user);
                 tempUserSecrets.remove(Integer.valueOf(userId));
                 return userId;
             }
-        }
-    }
-
-    public void printUserSecretsMap() {
-        for (Map.Entry<Integer, String> entry : userSecrets.entrySet()) {
-            Integer userId = entry.getKey();
-            String secret = entry.getValue();
-            System.out.println("UserID: " + userId + ", Secret: " + secret);
         }
     }
 }

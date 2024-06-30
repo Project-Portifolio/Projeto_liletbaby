@@ -6,6 +6,7 @@ import br.com.liletbaby.back_end.security.WebSecurityConfig;
 import br.com.liletbaby.back_end.security.providers.TokenCustomProvider;
 import br.com.liletbaby.back_end.services.DataValidatorService;
 import br.com.liletbaby.back_end.utils.NumericConverter;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -51,7 +52,6 @@ public class LoginController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Dados inválidos.");
         }
 
-        // Obter UserDetails do usuário
         UserDetails userDetails = usuarioRepositorio.findByName(username);
         if (userDetails == null || !passwordEncoder.matches(password, userDetails.getPassword())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário ou senha inválidos.");
@@ -66,7 +66,7 @@ public class LoginController {
 
     @PostMapping("/register")
     @ResponseBody
-    public ResponseEntity<?> register(@RequestBody Map<String, String> payload) { // Validar username e password antes.
+    public ResponseEntity<?> register(@RequestBody Map<String, String> payload) {
         String username = payload.get("username"), password = payload.get("password");
         String parsedData = DataValidatorService.validator(username, password);
 
@@ -91,7 +91,7 @@ public class LoginController {
 
     @PutMapping("/user/update")
     @ResponseBody
-    public ResponseEntity<?> userUpdate(@RequestBody Map<String, String> payload) { // Validar userID e username antes.
+    public ResponseEntity<?> userUpdate(@RequestBody Map<String, String> payload) {
         String username = payload.get("username"), fullName = payload.get("fullname"), email = payload.get("mail");
         Integer userID = NumericConverter.safeParseInteger(payload.get("userID"));
         String parsedData = DataValidatorService.validator(username, fullName, email);
