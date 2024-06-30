@@ -44,7 +44,6 @@ public class SecurityFilter extends OncePerRequestFilter {
                 UserDetails user = usuarioRepositorio.findByUserId(Integer.valueOf(userId));
 
                 if (user != null) {
-                    // Objeto Authentication precisa ser usado aqui para armazenar a classe que extende UserDetails
                     Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
